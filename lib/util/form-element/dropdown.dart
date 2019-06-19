@@ -11,7 +11,7 @@ class Dropdown extends StatefulWidget {
 
 class _DropdownState extends State<Dropdown> {
   List<String> data = [];
-  String selected = "";
+  String selected;
   @override
   void initState() {
     super.initState();
@@ -38,6 +38,7 @@ class _DropdownState extends State<Dropdown> {
             child: new Text(value),
           );
         }).toList(),
+        value: selected,
         onChanged: (_) {
           setState(() {
             selected = _;
