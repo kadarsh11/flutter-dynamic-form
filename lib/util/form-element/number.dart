@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 
 class Number extends StatelessWidget {
   final Fields fields;
-  final _formKey = GlobalKey<FormState>();
-  Number({@required this.fields});
+  final formKey;
+  Number({@required this.fields, @required this.formKey});
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: _formKey,
+      key: formKey,
       child: TextFormField(
+        keyboardType: TextInputType.number,
         decoration: InputDecoration(
             border: OutlineInputBorder(), hintText: fields.title),
         validator: (value) {

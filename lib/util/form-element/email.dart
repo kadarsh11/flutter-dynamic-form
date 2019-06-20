@@ -3,22 +3,23 @@ import 'package:flutter/material.dart';
 
 class Email extends StatelessWidget {
   final Fields fields;
-  final _formKey = GlobalKey<FormState>();
-  Email({@required this.fields});
+  final formKey;
+  Email({@required this.fields, @required this.formKey});
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: _formKey,
+      key: formKey,
       child: TextFormField(
+        keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
             border: OutlineInputBorder(), hintText: fields.title),
-        validator: (value) {
-          if (value.isEmpty) {
-            return 'Enter some text';
-          }
-          return null;
-        },
+        validator: (val) => val.trim().isEmpty
+            ? 'Email can\'t be empty.'
+            : RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+                    .hasMatch(val)
+                ? null
+                : 'Enter a Valid Email',
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:dynamic_form/form/form.dart';
-import 'package:dynamic_form/util/form-element/short-text.dart';
+import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:dynamic_form/model/form-model.dart';
@@ -54,27 +54,13 @@ class _HomePageState extends State<HomePage> {
       providers: [Provider<Key>.value(value: _formKey)],
       child: Scaffold(
         body: isLoading
-            ? CircularProgressIndicator()
-            : PageView(
-                children: formData.fields
-                    .map((field) => Container(
-                          child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                DynamicField(
-                                  fields: field,
-                                ),
-                                FlatButton(
-                                  onPressed: () {},
-                                  child: Text("Next"),
-                                )
-                              ],
-                            ),
-                          ),
-                        ))
-                    .toList(),
-              ),
+            ? Center(
+              child: CircularProgressIndicator(),
+            )
+            : DynamicFormScaffold(
+                height: MediaQuery.of(context).size.height,
+                width: double.infinity,
+                formData: formData),
       ),
     );
   }
