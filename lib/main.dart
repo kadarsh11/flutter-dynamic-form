@@ -5,7 +5,7 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:dynamic_form/model/form-model.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
 String FORM_URL =
@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
+        primaryColor: Color(0xFF00AF19),
         primarySwatch: Colors.blue,
       ),
       home: HomePage(),
@@ -36,12 +37,29 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    fetchFormData();
     super.initState();
+    getDatLocally();
   }
 
-  fetchFormData() {
-    http.get(FORM_URL).then((response) => response.body).then((data) {
+  getDatLocally() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var isFormSubmitted = sharedPreferences.get('isFormSubmitted') ?? false;
+    String data = sharedPreferences.get('formData');
+    if (data == null) {
+      fetchFormData();
+      print("API data");
+    } else {
+      formData = DynamicForm.fromJson(jsonDecode(data));
+      setState(() => isLoading = false);
+      print("Local data");
+    }
+  }
+
+  fetchFormData() async {
+    http.get(FORM_URL).then((response) => response.body).then((data) async {
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      await sharedPreferences.setString("formData", data);
       formData = DynamicForm.fromJson(jsonDecode(data));
       setState(() => isLoading = false);
       print(formData.title);
@@ -50,18 +68,19 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [Provider<Key>.value(value: _formKey)],
-      child: Scaffold(
-        body: isLoading
-            ? Center(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: isLoading
+          ? Center(
               child: CircularProgressIndicator(),
             )
-            : DynamicFormScaffold(
-                height: MediaQuery.of(context).size.height,
-                width: double.infinity,
-                formData: formData),
-      ),
+          : DynamicFormScaffold(
+              formData: formData,
+              itemPerPage: 2,
+              onSubmitted: (data) {
+                print(data);
+              },
+            ),
     );
   }
 }
